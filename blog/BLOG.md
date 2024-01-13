@@ -15,10 +15,13 @@ OpenTelemetry is a set of tools, APIs and SDKs used to instrument, generate, col
 and not a storage or visualization solution.
 
 ## System under monitoring
-To showcase the capabilities of OpenTelemetry lets first build a simple system to monitor.
+To showcase the capabilities of OpenTelemetry lets first build a simple service to monitor.
 TODO: 
-- System purpose and 
-- System architecture;
+- products-service - REST API to manage search products; (PG for storage and S3 for images);
+- Load tests using wrk to simulate traffic; 
+
+Languages used: Java and Python.
+![1-blog-otel-system-under-monitoring.png](images%2F1-blog-otel-system-under-monitoring.png)
 
 ## Direct publishing to an underlying monitoring system
 TODO:
@@ -47,7 +50,7 @@ UI is Grafana.
 
 Show diagram and code snippets.
 
-## Adding a new monitoring system
+## Extending monitoring system
 Show how to add a new monitoring system to the infrastructure - for Signoz.
 
 ## Managing signals
