@@ -21,9 +21,12 @@ TODO:
 - Load tests using wrk to simulate traffic; 
 
 Languages used: Java and Python.
-![1-blog-otel-system-under-monitoring.png](images%2F1-blog-otel-system-under-monitoring.png)
+![1-system-under-monitoring.png](images%2F1-system-under-monitoring.png)
 
-## Direct publishing to an underlying monitoring system
+## Direct publishing
+![2-direct-publishing.png](images%2F2-direct-publishing.png)
+
+Direct publishing to an underlying monitoring system
 TODO:
 - How to use OpenTelemetry to publish metrics directly to a monitoring system - Prometheus;
 - How to use OpenTelemetry to publish traces directly to a monitoring system - Jaeger;

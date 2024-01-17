@@ -1,0 +1,26 @@
+# Create product
+POST localhost:8080/api/product
+Content-Type: application/json
+
+{
+    "name": "Test product",
+    "description": "Test Description",
+    "price": 100.00
+}
+
+###
+
+# Get product
+GET localhost:8080/api/product/1
+
+###
+
+# Search product
+GET localhost:8080/api/product?query=Test
+
+###
+
+# Delete product
+DELETE localhost:8080/api/product/1
+
+
