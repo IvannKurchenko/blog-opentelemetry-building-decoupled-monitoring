@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -31,8 +32,8 @@ public class ProductController {
 
 
     @GetMapping("/api/product")
-    public String searchProducts(@RequestParam(required = false) String query) {
-        return "Greetings from Spring Boot!";
+    public List<Product> searchProducts(@RequestParam(required = false) String query) {
+        return productService.searchProducts(query);
     }
 
     @DeleteMapping("/api/product/{id}")
