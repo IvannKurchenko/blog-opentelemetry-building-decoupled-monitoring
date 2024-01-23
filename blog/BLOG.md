@@ -65,3 +65,6 @@ Code source for this blog post can be found [here](TODO)
 OpenTelemetry links:
 - OTLP protocol;
 - Supported languages;
+
+References:
+https://opentelemetry.io/docs/languages/java/automatic/spring-boot/ - Spring Boot instrumentation

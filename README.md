@@ -16,7 +16,7 @@ TODO
 Apart from source code current repo has the following folders:
 ```
 blog - blog post
-docker - various docker compose files to setup  
+docker-compose - various docker compose files to setup  
 ```
 
 ## How to run

@@ -1,10 +1,10 @@
 # Docker compose to demonstrate direct publishing of metrics and traces to monitoring backend.
-# Run with the following command: docker-compose -f docker-compose/monitoring-direct-publishing.yml up -d
+# Run with the following command: docker-compose -f docker-compose/setup-direct-publishing.yaml up -d
 version: "3.9"
 services:
   elasticsearch:
     extends:
-      file: products-service-environment.yaml
+      file: common-environment.yaml
       service: elasticsearch
     hostname: elasticsearch
     networks:
@@ -12,7 +12,7 @@ services:
 
   postgres:
     extends:
-      file: products-service-environment.yaml
+      file: common-environment.yaml
       service: postgres
     hostname: postgres
     networks:
@@ -20,7 +20,7 @@ services:
 
   products-service:
     extends:
-      file: products-service.yaml
+      file: common-products-service.yaml
       service: products-service
     depends_on:
       - postgres
@@ -30,7 +30,7 @@ services:
       - "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/products"
       - "SPRING_DATASOURCE_USERNAME=products_user"
       - "SPRING_DATASOURCE_PASSWORD=products_password"
-      - "SPRING_ELASTICSEARCH_REST_URIS=[elasticsearch:9200]"
+      - "SPRING_ELASTICSEARCH_REST_URI=elasticsearch:9200"
     networks:
       - products
 
