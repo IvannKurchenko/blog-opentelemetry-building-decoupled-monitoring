@@ -1,6 +1,6 @@
 # Docker Compose responsible for starting the storage services required by the product service.
 # In particular, it starts a PostgreSQL database and an Elasticsearch instance.
-version: '3.1'
+version: "3.9"
 
 services:
   postgres:

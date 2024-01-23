@@ -1,0 +1,24 @@
+# Docker Compose responsible for the product service only.
+# It expects the storage services to be already running on the same network.
+version: "3.9"
+
+services:
+
+  # Product service
+  products-service:
+    image: products-service
+    container_name: products-service
+    hostname: products-service
+    restart: always
+    networks:
+      - products
+    ports:
+      - "8080:8080"
+    environment:
+      - "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/products"
+      - "SPRING_DATASOURCE_USERNAME=products_user"
+      - "SPRING_DATASOURCE_PASSWORD=products_password"
+      - "SPRING_ELASTICSEARCH_REST_URIS=[elasticsearch:9200]"
+
+networks:
+  products:
