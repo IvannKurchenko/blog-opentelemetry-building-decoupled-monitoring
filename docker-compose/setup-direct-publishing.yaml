@@ -18,6 +18,22 @@ services:
     networks:
       - products
 
+  jaeger:
+    extends:
+      file: common-monitoring-prometheus-jeager.yml
+      service: jaeger
+    hostname: jaeger
+    networks:
+      - products
+
+  prometheus:
+    extends:
+      file: common-monitoring-prometheus-jeager.yml
+      service: prometheus
+    hostname: prometheus
+    networks:
+      - products
+
   products-service:
     extends:
       file: common-products-service.yaml
@@ -27,10 +43,19 @@ services:
       - elasticsearch
     hostname: products-service
     environment:
-      - "SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/products"
-      - "SPRING_DATASOURCE_USERNAME=products_user"
-      - "SPRING_DATASOURCE_PASSWORD=products_password"
-      - "SPRING_ELASTICSEARCH_REST_URI=elasticsearch:9200"
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/products
+      - SPRING_DATASOURCE_USERNAME=products_user
+      - SPRING_DATASOURCE_PASSWORD=products_password
+      - SPRING_ELASTICSEARCH_REST_URI=elasticsearch:9200
+      - OTEL_SERVICE_NAME=products_service
+      - OTEL_METRICS_EXPORTER=prometheus
+      - OTEL_EXPORTER_PROMETHEUS_PORT=9094
+      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+    ports:
+      - "10001:10001"
+      - "9094:9094"
     networks:
       - products
 

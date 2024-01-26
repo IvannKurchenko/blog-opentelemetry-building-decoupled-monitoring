@@ -25,9 +25,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 
-	implementation 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
-	implementation 'io.opentelemetry.instrumentation:opentelemetry-jdbc'
-	implementation 'io.opentelemetry.instrumentation:opentelemetry-elasticsearch-rest-common'
+	runtimeOnly 'io.opentelemetry.instrumentation:opentelemetry-spring-boot-starter'
+	runtimeOnly 'io.opentelemetry.instrumentation:opentelemetry-jdbc'
+	runtimeOnly 'io.opentelemetry.instrumentation:opentelemetry-elasticsearch-rest-common'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
@@ -36,6 +36,7 @@ dependencyManagement {
 	imports {
 		mavenBom("io.opentelemetry:opentelemetry-bom:1.34.1")
 		mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.0.0-alpha")
+
 	}
 }
 

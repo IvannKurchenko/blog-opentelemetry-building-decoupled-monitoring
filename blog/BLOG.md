@@ -68,3 +68,7 @@ OpenTelemetry links:
 
 References:
 https://opentelemetry.io/docs/languages/java/automatic/spring-boot/ - Spring Boot instrumentation
+https://medium.com/jaegertracing/introducing-native-support-for-opentelemetry-in-jaeger-eb661be8183c - used to configure Jaeger
+https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/docs/supported-libraries.md#libraries--frameworks-
+
+https://opentelemetry.io/docs/languages/java/automatic/spring-boot/
