@@ -36,7 +36,6 @@ dependencyManagement {
 	imports {
 		mavenBom("io.opentelemetry:opentelemetry-bom:1.34.1")
 		mavenBom("io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom-alpha:2.0.0-alpha")
-
 	}
 }
 

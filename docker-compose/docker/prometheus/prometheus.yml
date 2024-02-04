@@ -9,4 +9,4 @@ scrape_configs:
   - job_name: 'products-service'
     scrape_interval: 1s
     static_configs:
-      - targets: ['products_service:9094']
+      - targets: ['products-service:9094']

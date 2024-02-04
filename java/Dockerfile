@@ -6,6 +6,8 @@ WORKDIR /usr/src/products-service
 RUN ./gradlew bootJar
 
 FROM eclipse-temurin:21-jre-alpine
+ARG OTEL_VERSION=v2.0.0
+RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/$OTEL_VERSION/opentelemetry-javaagent.jar
 COPY --from=builder /usr/src/products-service/build/libs/products-service-0.0.1-SNAPSHOT.jar /usr/app/products-service.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/usr/app/products-service.jar"]
+ENTRYPOINT ["java","-javaagent:opentelemetry-javaagent.jar","-jar","/usr/app/products-service.jar"]
