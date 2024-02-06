@@ -8,6 +8,7 @@ easy to extend and decoupled from the application.
 TODO
 - What is OpenTelemetry in short
 - What is OTLP in short?
+- What is OTEL Colletor in short? https://opentelemetry.io/docs/concepts/components/#collector - definition.
 - Blog post purpose - show how to use OpenTelemetry and its protocol to decouple the monitoring infrastructure 
 from the application.
 
@@ -33,6 +34,9 @@ TODO:
 - How to use OpenTelemetry to publish logs directly to a monitoring system - ELK;
 
 Show diagram and code snippets.
+
+Prometheus query:
+`sum(products_service_http_server_request_duration_seconds_sum) / sum(products_service_http_server_request_duration_seconds_count)`
 
 ## Publishing to a collector 
 TODO:
@@ -67,6 +71,13 @@ OpenTelemetry links:
 - Supported languages;
 
 References:
+
+https://opentelemetry.io/docs/collector/ - OTEL collector documentation;
+https://opentelemetry.io/docs/kubernetes/helm/ - OTEL helm charts;
+
+https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors - recommended processors;
+https://opentelemetry.io/ecosystem/registry/?language=collector - OTEL collector extensions registry;
+
 https://opentelemetry.io/docs/languages/java/automatic/spring-boot/ - Spring Boot instrumentation
 https://medium.com/jaegertracing/introducing-native-support-for-opentelemetry-in-jaeger-eb661be8183c - used to configure Jaeger
 https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/docs/supported-libraries.md#libraries--frameworks-

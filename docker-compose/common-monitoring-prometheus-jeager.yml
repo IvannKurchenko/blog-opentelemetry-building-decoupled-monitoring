@@ -11,7 +11,7 @@ services:
 
   # Start Jeager for traces storage.
   # UI is available at http://localhost:16686
-  # See for more details: https://www.jaegertracing.io/docs/1.6/getting-started/
+  # See for more details: https://www.jaegertracing.io/docs/1.53/getting-started/#all-in-one
   jaeger:
     image: jaegertracing/all-in-one:1.53
     container_name: jaeger
@@ -24,13 +24,29 @@ services:
       - "4317:4317"
       - "4318:4318"
 
-  # Start prometheus.
-  # UI is available at http://localhost:9090
-  prometheus:
-    build: docker/prometheus/.
+  # Start prometheus that will collect metrics from the product service directly.
+  # The UI is available at http://localhost:9090
+  prometheus-direct:
+    image: prom/prometheus:v2.33.3
     container_name: prometheus
     hostname: prometheus
     restart: always
+    volumes:
+      - ./mount/prometheus-direct.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - products
+    ports:
+      - "9090:9090"
+
+  # Start prometheus that will collect metrics from the OTEL collector.
+  # The UI is available at http://localhost:9090
+  prometheus-collector:
+    image: prom/prometheus:v2.33.3
+    container_name: prometheus
+    hostname: prometheus
+    restart: always
+    volumes:
+      - ./mount/prometheus-collector.yml:/etc/prometheus/prometheus.yml
     networks:
       - products
     ports:
