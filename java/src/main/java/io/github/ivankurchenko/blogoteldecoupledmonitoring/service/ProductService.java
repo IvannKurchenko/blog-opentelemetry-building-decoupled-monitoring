@@ -21,8 +21,7 @@ public class ProductService {
     private final ProductDocumentRepository productDocumentRepository;
 
     public ProductService(ProductRepository productRepository,
-                          ProductDocumentRepository productDocumentRepository,
-                          ElasticsearchOperations elasticsearchOperations) {
+                          ProductDocumentRepository productDocumentRepository) {
         this.productRepository = productRepository;
         this.productDocumentRepository = productDocumentRepository;
     }

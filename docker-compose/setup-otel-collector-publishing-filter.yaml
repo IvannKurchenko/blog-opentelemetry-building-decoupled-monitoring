@@ -1,0 +1,69 @@
+# Docker compose to demonstrate publishing of metrics and traces to monitoring backend though OTEL collector.
+# Run with the following command: docker-compose -f docker-compose/setup-otel-collector-publishing.yaml up -d
+version: "3.9"
+services:
+  elasticsearch:
+    extends:
+      file: common-environment.yaml
+      service: elasticsearch
+    hostname: elasticsearch
+    networks:
+      - products
+
+  postgres:
+    extends:
+      file: common-environment.yaml
+      service: postgres
+    hostname: postgres
+    networks:
+      - products
+
+  jaeger:
+    extends:
+      file: common-monitoring-prometheus-jeager.yml
+      service: jaeger
+    hostname: jaeger
+    networks:
+      - products
+
+  prometheus:
+    extends:
+      file: common-monitoring-prometheus-jeager.yml
+      service: prometheus-collector
+    hostname: prometheus
+    networks:
+      - products
+
+  products-service:
+    extends:
+      file: common-products-service.yaml
+      service: products-service
+    depends_on:
+      - postgres
+      - elasticsearch
+    hostname: products-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/products
+      - SPRING_DATASOURCE_USERNAME=products_user
+      - SPRING_DATASOURCE_PASSWORD=products_password
+      - SPRING_ELASTICSEARCH_REST_URI=elasticsearch:9200
+      - OTEL_SERVICE_NAME=products_service
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4418
+    networks:
+      - products
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.93.0
+    hostname: otel-collector
+    volumes:
+      - ./mount/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "9094:9094" # Prometheus http exporter
+      - "4418:4418" # OTLP http receiver
+    networks:
+      - products
+
+networks:
+  products:

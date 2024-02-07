@@ -10,4 +10,6 @@ ARG OTEL_VERSION=v2.0.0
 RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/$OTEL_VERSION/opentelemetry-javaagent.jar
 COPY --from=builder /usr/src/products-service/build/libs/products-service-0.0.1-SNAPSHOT.jar /usr/app/products-service.jar
 EXPOSE 8080
+RUN apk add curl
+HEALTHCHECK --interval=1s --retries=3 --timeout=1s --start-period=5s CMD curl -f http://localhost:8080/health > /dev/null 2>&1 || exit 1
 ENTRYPOINT ["java","-javaagent:opentelemetry-javaagent.jar","-jar","/usr/app/products-service.jar"]

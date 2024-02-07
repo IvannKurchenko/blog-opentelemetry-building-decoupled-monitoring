@@ -14,14 +14,9 @@ receivers:
 processors:
   # Data sources: traces, metrics, logs
   memory_limiter:
-    check_interval: 5s
+    check_interval: 1s
     limit_mib: 4000
     spike_limit_mib: 500
-
-  # Data sources: traces
-  probabilistic_sampler:
-    hash_seed: 22
-    sampling_percentage: 15
 
 
 # Exporters' configuration section
@@ -42,7 +37,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, probabilistic_sampler]
+      processors: [memory_limiter]
       exporters: [otlphttp]
     metrics:
       receivers: [otlp]
