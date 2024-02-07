@@ -64,6 +64,11 @@ Show how to add a new monitoring system to the infrastructure - for Signoz.
 As extra we can show how to manage signals - metrics, traces and logs - e.g. filter, transform, aggregate etc. using
 collector processors.
 
+https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor - filter processor;
+show example - filter traces and metrics for health checks
+
+Add attribute - environment=prod for all signals.
+
 ## Links and further reading
 Code source for this blog post can be found [here](TODO)
 OpenTelemetry links:

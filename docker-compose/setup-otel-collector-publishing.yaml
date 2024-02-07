@@ -58,7 +58,7 @@ services:
     image: otel/opentelemetry-collector-contrib:0.93.0
     hostname: otel-collector
     volumes:
-      - ./mount/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+      - ./mount/otel-collector-config-prometheus-jaeger.yaml:/etc/otelcol-contrib/config.yaml
     ports:
       - "9094:9094" # Prometheus http exporter
       - "4418:4418" # OTLP http receiver
