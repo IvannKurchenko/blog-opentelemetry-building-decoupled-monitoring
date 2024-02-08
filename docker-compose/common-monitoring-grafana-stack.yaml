@@ -1,0 +1,33 @@
+# Docker Compose responsible for the starting Grafana stack of monitoring backend services as a showcase for
+# OpenTelemetry collector connection.
+# In particular, the following services are started:
+# - ??? - for metrics collection and storage;
+# - Tempo - for traces collection and storage. See for more details: https://grafana.com/oss/tempo
+version: '3.9'
+
+services:
+
+  # This configuration is largely inspired by the Tempo local storage docker-compose example:
+  # https://github.com/grafana/tempo/blob/main/example/docker-compose/local/docker-compose.yaml
+  # It uses a fixed version of the Tempo image at the most recent commit at the time of writing.
+  tempo:
+    image: grafana/tempo:main-5b739f8
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./mount/tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "5317:4317"  # otlp grpc
+      - "5318:4318"  # otlp http
+      - "3200:3200"  # tempo
+
+  grafana:
+    image: grafana/grafana:10.2.2
+    volumes:
+      - ./mount/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+      - GF_FEATURE_TOGGLES_ENABLE=traceqlEditor traceQLStreaming metricsSummary
+    ports:
+      - "3000:3000"

@@ -1,10 +1,8 @@
-# Docker Compose responsible for the starting monitoring backend services as a show case for
-# OpenTelemetry direct connection.
+# Docker Compose responsible for the starting monitoring backend services as a showcase for
+# OpenTelemetry direct connection and OpenTelemetry collector connection.
 # In particular, the following services are started:
 # - Prometheus - for metrics collection and storage;
 # - Jaeger - for traces collection and storage;
-#
-# Run with the following command: docker-compose -f docker-compose/opentelemetry/prometheus-docker-compose.yml up -d
 version: '3.9'
 
 services:

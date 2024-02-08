@@ -58,7 +58,10 @@ UI is Grafana.
 Show diagram and code snippets.
 
 ## Extending monitoring system
-Show how to add a new monitoring system to the infrastructure - for Signoz.
+Show how to add a new monitoring system to the infrastructure - for Grafana.
+
+http://localhost:3000/explore?panes=%7B%22GwV%22:%7B%22datasource%22:%22tempo%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22tempo%22%7D,%22queryType%22:%22traceqlSearch%22,%22limit%22:20,%22tableType%22:%22traces%22,%22filters%22:%5B%7B%22id%22:%22949bb2c6%22,%22operator%22:%22%3D%22,%22scope%22:%22span%22%7D,%7B%22id%22:%22min-duration%22,%22tag%22:%22duration%22,%22operator%22:%22%3E%22,%22valueType%22:%22duration%22,%22value%22:%2250ms%22%7D%5D,%22groupBy%22:%5B%7B%22id%22:%2299afbe22%22,%22scope%22:%22span%22%7D%5D%7D%5D,%22range%22:%7B%22from%22:%22now-6h%22,%22to%22:%22now%22%7D%7D%7D&schemaVersion=1&orgId=1 -
+Grafana Tempo - trace search example;
 
 ## Managing signals
 As extra we can show how to manage signals - metrics, traces and logs - e.g. filter, transform, aggregate etc. using

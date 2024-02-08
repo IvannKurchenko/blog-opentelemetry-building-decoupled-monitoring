@@ -1,0 +1,51 @@
+# This OTEL collector configuration file that aims is to extend initial setup and export telemetry data additionally to
+# Grafana stack backend services. In particular, they are:
+# - Metrics are exported to Prometheus and (Mimir?);
+# - Traces are exported to Jaeger and Tempo;
+# - Logs are exported to Loki.
+# It exposes a single OTLP receiver for this purpose.
+
+# Receivers' configuration section
+# See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#receivers
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4418
+
+# Processors' configuration section
+# See fore more details following documentation: https://opentelemetry.io/docs/collector/configuration/#processors
+processors:
+  # Data sources: traces, metrics, logs
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 4000
+    spike_limit_mib: 500
+
+
+# Exporters' configuration section
+# See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#exporters
+exporters:
+  # Data sources: traces
+  otlphttp/jaeger:
+    endpoint: http://jaeger:4318
+
+  otlphttp/tempo:
+    endpoint: http://tempo:4318
+
+  # Data sources: metrics
+  prometheus:
+    endpoint: 0.0.0.0:9094
+    namespace: products_service
+
+# Services configuration section
+# See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#services
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlphttp/jaeger,otlphttp/tempo]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus]
