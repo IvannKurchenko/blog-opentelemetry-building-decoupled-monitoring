@@ -51,3 +51,7 @@ service:
     metrics:
       receivers: [otlp]
       exporters: [prometheus,otlphttp/grafana-agent]
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter]
+      exporters: [otlphttp/grafana-agent]

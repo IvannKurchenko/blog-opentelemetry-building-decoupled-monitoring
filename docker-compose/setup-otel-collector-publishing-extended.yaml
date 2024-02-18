@@ -58,6 +58,14 @@ services:
     networks:
       - products
 
+  loki:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: loki
+    hostname: loki
+    networks:
+      - products
+
   grafana:
     extends:
       file: common-monitoring-grafana-stack.yaml
@@ -82,6 +90,7 @@ services:
       - OTEL_SERVICE_NAME=products_service
       - OTEL_METRICS_EXPORTER=otlp
       - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4418
     networks:
       - products

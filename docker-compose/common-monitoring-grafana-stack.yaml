@@ -10,7 +10,7 @@ services:
   # Start Grafana Tempo to receive and store tracing data
   # This configuration is largely inspired by the Tempo local storage docker-compose example:
   # https://github.com/grafana/tempo/blob/main/example/docker-compose/local/docker-compose.yaml
-  # It uses a fixed version of the Tempo image at the most recent commit at the time of writing.
+  # It uses a latest version of the Tempo image at the time of writing.
   tempo:
     image: grafana/tempo:2.3.1
     command: [ "-config.file=/etc/grafana-tempo.yaml" ]
@@ -25,7 +25,7 @@ services:
   # Starts Grafana Mimir to receive and store metrics data.
   # This configuration is largely inspired by the Mimir "Get Started" documentation:
   # https://grafana.com/docs/mimir/latest/get-started/
-  # It uses a fixed version of the Tempo image at the most recent commit at the time of writing.
+  # It uses a latest version of the Mimir image at the time of writing.
   mimir:
     image: grafana/mimir:2.11.0
     command: [ "-config.file=/etc/grafana-mimir.yaml" ]
@@ -34,6 +34,19 @@ services:
       - ./mount/grafana-mimir.yaml:/etc/grafana-mimir.yaml
     ports:
       - "9009:9009" # Mimir port
+
+  # Starts Grafana Loki to receive and store logs data.
+  # This configuration is largely inspired by the following documentation:
+  # https://grafana.com/docs/loki/latest/setup/install/docker/
+  # It uses the latest version of the Loki image at the time of writing.
+  loki:
+    image: grafana/loki:2.9.4
+    command: ["-config.file=/etc/loki/grafana-loki.yaml"]
+    restart: always
+    volumes:
+      - ./mount/grafana-loki.yaml:/etc/loki/grafana-loki.yaml
+    ports:
+      - "3100:3100" # Loki port
 
   # Start grafana agent to receive data from OpenTelemetry collector.
   # See for more details: https://grafana.com/docs/agent/latest/static/set-up/install/install-agent-docker/

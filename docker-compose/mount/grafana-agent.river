@@ -25,8 +25,8 @@ otelcol.receiver.otlp "otlp" {
 otelcol.processor.batch "otlp" {
   output {
     metrics = [otelcol.exporter.prometheus.metrics.input]
-    // logs    = [otelcol.exporter.otlp.grafana.input]
-    traces  = [otelcol.exporter.otlp.grafana.input]
+    logs    = [otelcol.exporter.loki.logs.input]
+    traces  = [otelcol.exporter.otlp.tempo.input]
   }
 }
 
@@ -44,7 +44,17 @@ prometheus.remote_write "mimir" {
     }
 }
 
-otelcol.exporter.otlp "grafana" {
+otelcol.exporter.loki "logs" {
+	forward_to = [loki.write.default.receiver]
+}
+
+loki.write "default" {
+	endpoint {
+		url = "http://loki:3100/loki/api/v1/push"
+    }
+}
+
+otelcol.exporter.otlp "tempo" {
   client {
     // Send to the locally running Tempo instance, on port 4317 (OTLP gRPC).
     endpoint = "tempo:4317"

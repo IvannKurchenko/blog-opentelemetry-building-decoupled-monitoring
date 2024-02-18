@@ -15,6 +15,7 @@ datasources:
     isDefault: false
     version: 1
     editable: false
+
   - name: Tempo
     type: tempo
     access: proxy
@@ -30,3 +31,11 @@ datasources:
       httpMethod: GET
       serviceMap:
         datasourceUid: prometheus
+
+  - name: Loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    jsonData:
+      timeout: 60
+      maxLines: 1000
