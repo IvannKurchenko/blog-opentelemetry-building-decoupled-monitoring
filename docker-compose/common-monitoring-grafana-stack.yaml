@@ -13,6 +13,7 @@ services:
   tempo:
     image: grafana/tempo:main-5b739f8
     command: [ "-config.file=/etc/tempo.yaml" ]
+    restart: always
     volumes:
       - ./mount/tempo.yaml:/etc/tempo.yaml
     ports:
@@ -20,8 +21,27 @@ services:
       - "5318:4318"  # otlp http
       - "3200:3200"  # tempo
 
+  # Start grafana agent to receive data from OpenTelemetry collector.
+  # See for more details: https://grafana.com/docs/agent/latest/static/set-up/install/install-agent-docker/
+  grafana-agent:
+    image: grafana/agent:v0.39.2
+    restart: always
+    environment:
+      - AGENT_MODE=flow
+    volumes:
+      - ./mount/grafana-agent.river:/etc/agent/grafana-agent.river
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - /etc/agent/grafana-agent.river
+    ports:
+      - "6317:4317"  # OTLP grpc
+      - "6318:4318"  # OTLP http
+      - "12345:12345" # UI
+
   grafana:
     image: grafana/grafana:10.2.2
+    restart: always
     volumes:
       - ./mount/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
     environment:

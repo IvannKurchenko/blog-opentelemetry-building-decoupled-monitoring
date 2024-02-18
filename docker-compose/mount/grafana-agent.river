@@ -1,0 +1,45 @@
+// Grafana agent configuration file setup OTLP receiver to receive data from OpenTelemetry collector.
+// Telemetry data then routed to Grafana stack backend services:
+// - Metrics are exported to Mimir;
+// - Traces are exported to Tempo;
+// - Logs are exported to Loki.
+// See the following documentation for more details:
+// - Grafana Agent - OTEL data configuration example: https://grafana.com/docs/agent/latest/flow/tasks/opentelemetry-to-lgtm-stack/
+
+otelcol.receiver.otlp "otlp" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    metrics = [otelcol.processor.batch.otlp.input]
+    logs    = [otelcol.processor.batch.otlp.input]
+    traces  = [otelcol.processor.batch.otlp.input]
+  }
+}
+
+otelcol.processor.batch "otlp" {
+  output {
+    // metrics = [otelcol.exporter.otlp.grafana.input]
+    // logs    = [otelcol.exporter.otlp.grafana.input]
+    traces  = [otelcol.exporter.otlp.grafana.input]
+  }
+}
+
+otelcol.exporter.otlp "grafana" {
+  client {
+    // Send to the locally running Tempo instance, on port 4317 (OTLP gRPC).
+    endpoint = "tempo:4317"
+    // Configure TLS settings for communicating with the endpoint.
+    tls {
+        // The connection is insecure.
+        insecure = true
+        // Do not verify TLS certificates when connecting.
+        insecure_skip_verify = true
+    }
+  }
+}

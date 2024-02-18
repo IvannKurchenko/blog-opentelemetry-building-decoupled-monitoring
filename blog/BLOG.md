@@ -60,8 +60,19 @@ Show diagram and code snippets.
 ## Extending monitoring system
 Show how to add a new monitoring system to the infrastructure - for Grafana.
 
+https://grafana.com/docs/agent/latest/flow/tasks/collect-opentelemetry-data/#configure-an-opentelemetry-protocol-receiver -
+configure OTLP receiver in Grafana Agent;
+configure OTLP exporter to Grafana Agent;
+configure Grafana Agent to export to Tempo, Mimir and Loki;
+
 http://localhost:3000/explore?panes=%7B%22GwV%22:%7B%22datasource%22:%22tempo%22,%22queries%22:%5B%7B%22refId%22:%22A%22,%22datasource%22:%7B%22type%22:%22tempo%22,%22uid%22:%22tempo%22%7D,%22queryType%22:%22traceqlSearch%22,%22limit%22:20,%22tableType%22:%22traces%22,%22filters%22:%5B%7B%22id%22:%22949bb2c6%22,%22operator%22:%22%3D%22,%22scope%22:%22span%22%7D,%7B%22id%22:%22min-duration%22,%22tag%22:%22duration%22,%22operator%22:%22%3E%22,%22valueType%22:%22duration%22,%22value%22:%2250ms%22%7D%5D,%22groupBy%22:%5B%7B%22id%22:%2299afbe22%22,%22scope%22:%22span%22%7D%5D%7D%5D,%22range%22:%7B%22from%22:%22now-6h%22,%22to%22:%22now%22%7D%7D%7D&schemaVersion=1&orgId=1 -
 Grafana Tempo - trace search example;
+
+Note - Grafana has also Mimir - newest solution for metrics, but 
+at the time of writing this blog post it did not support OTLP protocol.
+https://grafana.com/oss/mimir/
+
+
 
 ## Managing signals
 As extra we can show how to manage signals - metrics, traces and logs - e.g. filter, transform, aggregate etc. using
@@ -93,3 +104,6 @@ https://medium.com/jaegertracing/introducing-native-support-for-opentelemetry-in
 https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/docs/supported-libraries.md#libraries--frameworks-
 
 https://opentelemetry.io/docs/languages/java/automatic/spring-boot/
+
+https://medium.com/@gleydsoncavalcanti/sending-traces-with-the-grafana-agent-for-grafana-tempo-4092b25c35d0
+https://github.com/grafana/intro-to-mltp - grafana stack demo example

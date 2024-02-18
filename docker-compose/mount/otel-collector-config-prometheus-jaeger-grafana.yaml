@@ -25,13 +25,15 @@ processors:
 
 # Exporters' configuration section
 # See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#exporters
+# Important note: exporter name patter is following - `{protocol}/{exporter_name}`.
+# `exporter_name` is optional in general case, however, it must be added if there are multiple exporters using the same protocol.
 exporters:
   # Data sources: traces
   otlphttp/jaeger:
     endpoint: http://jaeger:4318
 
-  otlphttp/tempo:
-    endpoint: http://tempo:4318
+  otlphttp/grafana-agent:
+    endpoint: http://grafana-agent:4318
 
   # Data sources: metrics
   prometheus:
@@ -45,7 +47,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [memory_limiter]
-      exporters: [otlphttp/jaeger,otlphttp/tempo]
+      exporters: [otlphttp/jaeger,otlphttp/grafana-agent]
     metrics:
       receivers: [otlp]
       exporters: [prometheus]

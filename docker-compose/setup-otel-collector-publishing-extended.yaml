@@ -34,6 +34,14 @@ services:
     networks:
       - products
 
+  grafana-agent:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: grafana-agent
+    hostname: grafana-agent
+    networks:
+      - products
+
   tempo:
     extends:
       file: common-monitoring-grafana-stack.yaml
