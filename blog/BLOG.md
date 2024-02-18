@@ -107,3 +107,4 @@ https://opentelemetry.io/docs/languages/java/automatic/spring-boot/
 
 https://medium.com/@gleydsoncavalcanti/sending-traces-with-the-grafana-agent-for-grafana-tempo-4092b25c35d0
 https://github.com/grafana/intro-to-mltp - grafana stack demo example
+https://grafana.com/docs/mimir/latest/get-started/ - grafana mimir quick startup example;

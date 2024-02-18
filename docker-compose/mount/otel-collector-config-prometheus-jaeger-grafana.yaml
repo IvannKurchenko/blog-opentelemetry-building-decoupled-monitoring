@@ -50,4 +50,4 @@ service:
       exporters: [otlphttp/jaeger,otlphttp/grafana-agent]
     metrics:
       receivers: [otlp]
-      exporters: [prometheus]
+      exporters: [prometheus,otlphttp/grafana-agent]

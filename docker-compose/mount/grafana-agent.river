@@ -24,10 +24,24 @@ otelcol.receiver.otlp "otlp" {
 
 otelcol.processor.batch "otlp" {
   output {
-    // metrics = [otelcol.exporter.otlp.grafana.input]
+    metrics = [otelcol.exporter.prometheus.metrics.input]
     // logs    = [otelcol.exporter.otlp.grafana.input]
     traces  = [otelcol.exporter.otlp.grafana.input]
   }
+}
+
+// The OpenTelemetry Prometheus exporter will transform incoming OTLP metrics data into Prometheus format data.
+otelcol.exporter.prometheus "metrics" {
+    forward_to = [prometheus.remote_write.mimir.receiver]
+}
+
+// The prometheus.remote_write component defines an endpoint for remotely writing metrics to.
+// In this case, our locally running Mimir service.
+prometheus.remote_write "mimir" {
+    // The endpoint is the Mimir service.
+    endpoint {
+        url = "http://mimir:9009/api/v1/push"
+    }
 }
 
 otelcol.exporter.otlp "grafana" {

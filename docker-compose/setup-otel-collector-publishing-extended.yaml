@@ -50,6 +50,14 @@ services:
     networks:
       - products
 
+  mimir:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: mimir
+    hostname: mimir
+    networks:
+      - products
+
   grafana:
     extends:
       file: common-monitoring-grafana-stack.yaml
