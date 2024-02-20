@@ -5,6 +5,8 @@
 # - Logs are exported to Grafana Agent;
 # It exposes a single OTLP receiver for this purpose.
 
+# Additionally to extended number of backends to send data to, it also includes possibility
+
 # Receivers' configuration section
 # See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#receivers
 receivers:
@@ -22,6 +24,25 @@ processors:
     limit_mib: 4000
     spike_limit_mib: 500
 
+  # Filter HTTP spans to server for `GET /health` requests because of spam.
+  # See documentation for more details:
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor
+  filter/exclude-health-api-traces:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.route"] == "/health"'
+
+  # Filter metrics for `GET /health` requests logs because of spam.
+  # Log line body to filter example: `Health check API invoked!`
+  # See documentation for more details:
+  # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor
+  filter/exclude-health-api-logs:
+    logs:
+      exclude:
+        match_type: regexp
+        bodies:
+          - '.*Health check API invoked!.*'
 
 # Exporters' configuration section
 # See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#exporters
@@ -45,13 +66,27 @@ exporters:
 service:
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [memory_limiter]
-      exporters: [otlphttp/jaeger,otlphttp/grafana-agent]
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - filter/exclude-health-api-traces
+      exporters:
+        - otlphttp/jaeger
+        - otlphttp/grafana-agent
     metrics:
-      receivers: [otlp]
-      exporters: [prometheus,otlphttp/grafana-agent]
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+      exporters:
+        - prometheus
+        - otlphttp/grafana-agent
     logs:
-      receivers: [otlp]
-      processors: [memory_limiter]
-      exporters: [otlphttp/grafana-agent]
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - filter/exclude-health-api-logs
+      exporters:
+        - otlphttp/grafana-agent

@@ -1,5 +1,5 @@
 # Docker compose to demonstrate publishing of metrics and traces to monitoring backend though OTEL collector.
-# Run with the following command: docker-compose -f docker-compose/setup-otel-collector-publishing.yaml up -d
+# Run with the following command: docker-compose -f docker-compose/setup-otel-collector-publishing-extended-filter.yaml up -d
 version: "3.9"
 services:
   elasticsearch:
@@ -34,6 +34,46 @@ services:
     networks:
       - products
 
+  grafana-agent:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: grafana-agent
+    hostname: grafana-agent
+    networks:
+      - products
+
+  tempo:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: tempo
+    hostname: tempo
+    networks:
+      - products
+
+  mimir:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: mimir
+    hostname: mimir
+    networks:
+      - products
+
+  loki:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: loki
+    hostname: loki
+    networks:
+      - products
+
+  grafana:
+    extends:
+      file: common-monitoring-grafana-stack.yaml
+      service: grafana
+    hostname: grafana
+    networks:
+      - products
+
   products-service:
     extends:
       file: common-products-service.yaml
@@ -50,6 +90,7 @@ services:
       - OTEL_SERVICE_NAME=products_service
       - OTEL_METRICS_EXPORTER=otlp
       - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4418
     networks:
       - products
@@ -58,10 +99,7 @@ services:
     image: otel/opentelemetry-collector-contrib:0.93.0
     hostname: otel-collector
     volumes:
-      - ./mount/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
-    ports:
-      - "9094:9094" # Prometheus http exporter
-      - "4418:4418" # OTLP http receiver
+      - ./mount/otel-collector-config-prometheus-jaeger-grafana-filter.yaml:/etc/otelcol-contrib/config.yaml
     networks:
       - products
 

@@ -1,5 +1,5 @@
 # Docker compose to demonstrate publishing of metrics and traces to monitoring backend though OTEL collector.
-# Run with the following command: docker-compose -f docker-compose/setup-otel-collector-publishing.yaml up -d
+# Run with the following command: docker-compose -f docker-compose/setup-otel-collector-publishing-extended.yaml up -d
 version: "3.9"
 services:
   elasticsearch:
@@ -100,9 +100,6 @@ services:
     hostname: otel-collector
     volumes:
       - ./mount/otel-collector-config-prometheus-jaeger-grafana.yaml:/etc/otelcol-contrib/config.yaml
-    ports:
-      - "9094:9094" # Prometheus http exporter
-      - "4418:4418" # OTLP http receiver
     networks:
       - products
 
