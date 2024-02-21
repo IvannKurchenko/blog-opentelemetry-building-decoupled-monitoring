@@ -87,6 +87,8 @@ https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/proc
 Add attribute - environment=prod for all signals.
   https://opentelemetry.io/docs/collector/transforming-telemetry/#adding-or-deleting-attributes
 
+NOTE - PROCESSORS AT THE MOMENT OF WRITING ARE ALPHA VERSION AND SUBJECT TO CHANGE!
+
 ## Links and further reading
 Code source for this blog post can be found [here](TODO)
 OpenTelemetry links:

@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This script is used to generate traffic to the API server.
+# It creates, retrieves, searches, and deletes 100 product items.
+# It expects the API server to be running on localhost:8080.
+# API server host and port can be overridden by setting the HOST and PORT environment variables.
+
 HOST=${HOST:-localhost}
 PORT=${PORT:-8080}
 BASE_URL="http://$HOST:$PORT/api"
