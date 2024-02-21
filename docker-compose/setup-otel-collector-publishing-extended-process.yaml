@@ -99,7 +99,7 @@ services:
     image: otel/opentelemetry-collector-contrib:0.93.0
     hostname: otel-collector
     volumes:
-      - ./mount/otel-collector-config-prometheus-jaeger-grafana-filter.yaml:/etc/otelcol-contrib/config.yaml
+      - ./mount/otel-collector-config-prometheus-jaeger-grafana-process.yaml:/etc/otelcol-contrib/config.yaml
     networks:
       - products
 

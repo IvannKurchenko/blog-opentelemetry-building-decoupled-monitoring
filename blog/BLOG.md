@@ -80,10 +80,12 @@ collector processors.
 
 https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor - filter processor;
 show example - filter traces and metrics for health checks
+https://opentelemetry.io/docs/collector/transforming-telemetry/#basic-filtering
 
 https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor
 - attributes processor;
 Add attribute - environment=prod for all signals.
+  https://opentelemetry.io/docs/collector/transforming-telemetry/#adding-or-deleting-attributes
 
 ## Links and further reading
 Code source for this blog post can be found [here](TODO)

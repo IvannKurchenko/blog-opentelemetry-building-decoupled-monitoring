@@ -33,7 +33,7 @@ processors:
       span:
         - 'attributes["http.route"] == "/health"'
 
-  # Filter metrics for `GET /health` requests logs because of spam.
+  # Filter logs for `GET /health` requests logs because of spam.
   # Log line body to filter example: `Health check API invoked!`
   # See documentation for more details:
   # https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor
@@ -43,6 +43,15 @@ processors:
         match_type: regexp
         bodies:
           - '.*Health check API invoked!.*'
+
+  # Add environment attribute to all telemetry signals.
+  # See documentation for more details:
+  # https://opentelemetry.io/docs/collector/transforming-telemetry/#adding-or-deleting-attributes
+  attributes/add-environment:
+    actions:
+      - key: environment
+        value: development
+        action: insert
 
 # Exporters' configuration section
 # See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#exporters
@@ -71,6 +80,7 @@ service:
       processors:
         - memory_limiter
         - filter/exclude-health-api-traces
+        - attributes/add-environment
       exporters:
         - otlphttp/jaeger
         - otlphttp/grafana-agent
@@ -79,6 +89,7 @@ service:
         - otlp
       processors:
         - memory_limiter
+        - attributes/add-environment
       exporters:
         - prometheus
         - otlphttp/grafana-agent
@@ -88,5 +99,6 @@ service:
       processors:
         - memory_limiter
         - filter/exclude-health-api-logs
+        - attributes/add-environment
       exporters:
         - otlphttp/grafana-agent
