@@ -100,8 +100,8 @@ docker-compose -f docker-compose/setup-otel-collector-publishing-extended-proces
 You can check application status, send traffic as described in the previous section.
 You can check telemetry data in the same way as in the previous setup.
 
-Make sure there is no logs containing `Health check API invoked!` line in the log line body in Loki using the following query: `{job="products_service"} |~ "Health check API invoked!.*"`
-Make sure there is no traces for `GET /health` requests in Tempo.
+Make sure there are no logs containing `Health check API invoked!` line in the log line body in Loki using the following query: `{job="products_service"} |~ "Health check API invoked!.*"`
+Make sure there are no traces for `GET /health` requests in Tempo.
 
 Stop environment using docker compose:
 ```
