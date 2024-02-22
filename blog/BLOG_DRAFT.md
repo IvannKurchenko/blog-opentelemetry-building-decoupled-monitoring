@@ -38,7 +38,7 @@ Show diagram and code snippets.
 Prometheus query:
 `sum(products_service_http_server_request_duration_seconds_sum) / sum(products_service_http_server_request_duration_seconds_count)`
 
-## Publishing to a collector 
+## Publishing to a collector
 TODO:
 - What is OTLP protocol in details;
 - What is a OTLP collector and exporter etc;

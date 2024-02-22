@@ -80,5 +80,50 @@ To produce some telemetry data out of application, we need to simulate traffic.
 For this, we will have [a simple script](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/traffic.sh)
 to create, read, search and delete 100 products sequentially.
 
-## Direct publishing
+Although This service is implemented in Java and Spring Boot, please, bear in mind that approaches shown further can be applied to any language, framework or other software that leverages OpenTelemetry to produce telemetry signals.   
 
+## Direct publishing
+We have an application that we want to monitor. In the simplest case, we can plug the instrumentation and supply configuration to send telemetry data directly to backends.
+One of the versions of the described setup might look in the following way:
+
+![2-direct-publishing.png](images%2F2-direct-publishing.png)
+
+As it is shown in the diagram, OpenTelemetry instrumentation can directly send metrics to [Prometheus](https://prometheus.io) and traces to [Jaeger](https://www.jaegertracing.io).
+In the case of Java or any other JVM language, we can pick default [OpenTelemetry Java agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and use in the service Docker like so:
+```dockerfile
+# Download OpenTelemetry
+ARG OTEL_VERSION=v2.0.0
+RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/$OTEL_VERSION/opentelemetry-javaagent.jar
+
+#...
+
+# Add java agnet to enable telemetry instrumentation
+ENTRYPOINT ["java","-javaagent:opentelemetry-javaagent.jar","-jar","/usr/app/products-service.jar"]
+```
+
+Some details are omitted. Full Dockerfile can be found at [the GitHub repository](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/java/Dockerfile).
+Once the instrumentation is plugged, it can be configured with the following environment variables to expose `9094` port to scrape metrics by Prometheus and send traces to Jaeger:  
+```shell
+OTEL_SERVICE_NAME=products_service
+OTEL_METRICS_EXPORTER=prometheus
+OTEL_EXPORTER_PROMETHEUS_PORT=9094
+OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
+OTEL_TRACES_EXPORTER=otlp
+OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318
+```
+
+You can find in the GitHub repository [Docker compose file](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/master/docker-compose/setup-direct-publishing.yaml) to run this setup.
+Let run the whole setup and run the script to simulate traffic. Firstly, to check metrics in Prometheus open http://localhost:9090/graph in your browser.
+We can use the following PromQL query to calculate average response latency: `sum(http_server_request_duration_seconds_sum) / sum(http_server_request_duration_seconds_count)`
+
+You can observe something like in the following screenshot:
+![3-direct-publishing-prometheus.png](images%2F3-direct-publishing-prometheus.png)
+
+To check the trace data, open Jaeger at http://localhost:16686, search for traces for Service `products_service` and Operation `POST /api/product`.
+![3-direct-publishing-jaeger-search.png](images%2F3-direct-publishing-jaeger-search.png)
+
+We can open of the traces to check details and inner spans:
+![3-direct-publishing-jaeger-trace.png](images%2F3-direct-publishing-jaeger-trace.png)
+
+## Publishing to a collector
+Since our
