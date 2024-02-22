@@ -16,6 +16,11 @@ The repository is organized as follows:
 ## How to run
 
 ## Prerequisites
+Before running any system setup, you need to have the following tools installed:
+- Docker
+- Docker Compose
+
+## Build the example application
 Before running any system setup, you need to build the example application:
 ```
 cd java
