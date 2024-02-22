@@ -24,3 +24,61 @@ In particular, I'd like to mention two specifications:
 We will not do a deep inside these specs, but it is worth briefly mentioning them for better further understanding.
 
 
+## System under monitoring
+To showcase the capabilities of OpenTelemetry, let's first build a simple service to monitor.
+This is going to be a simple HTTP REST service for online shop product management, that provides CRUD API for simple products with name, description and price.
+To make it a bit more interesting, let's also add full text search capabilities, so we can have more complex telemetry data.
+Product service architecture can be described with the following diagram:
+![1-system-under-monitoring.png](images%2F1-system-under-monitoring.png)
+
+And its API examples:
+```http request
+# Create product. Response body example for 200 OK:
+# {
+#  "id": 3,
+#  "name": "Test product",
+#  "description": "Test Description",
+#  "price": 100
+#}
+POST localhost:8080/api/product
+Content-Type: application/json
+
+{
+  "name": "Test product",
+  "description": "Test Description",
+  "price": 100.00
+}
+
+###
+# Get product. Response body example for 200 OK:
+# {
+#  "id": 1,
+#  "name": "Test product",
+#  "description": "Test Description",
+#  "price": 100
+# }
+GET localhost:8080/api/product/1
+
+###
+# Search product. # Response body example for 200 OK:
+# [
+#    {
+#        "id": 1,
+#        "name": "Test product",
+#        "description": "Test Description",
+#        "price": 100
+#    }
+# ]
+GET localhost:8080/api/product?query=Test
+
+###
+# Delete product. Response body for 200 OK is empty.
+DELETE localhost:8080/api/product/1
+```
+
+To produce some telemetry data out of application, we need to simulate traffic.
+For this, we will have [a simple script](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/traffic.sh)
+to create, read, search and delete 100 products sequentially.
+
+## Direct publishing
+

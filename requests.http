@@ -1,26 +1,41 @@
-# Create product
+# Create product. Response body example for 200 OK:
+# {
+#  "id": 3,
+#  "name": "Test product",
+#  "description": "Test Description",
+#  "price": 100
+#}
 POST localhost:8080/api/product
 Content-Type: application/json
 
 {
-    "name": "Test product",
-    "description": "Test Description",
-    "price": 100.00
+  "name": "Test product",
+  "description": "Test Description",
+  "price": 100.00
 }
 
 ###
-
-# Get product
+# Get product. Response body example for 200 OK:
+# {
+#  "id": 1,
+#  "name": "Test product",
+#  "description": "Test Description",
+#  "price": 100
+# }
 GET localhost:8080/api/product/1
 
 ###
-
-# Search product
+# Search product. # Response body example for 200 OK:
+# [
+#    {
+#        "id": 1,
+#        "name": "Test product",
+#        "description": "Test Description",
+#        "price": 100
+#    }
+# ]
 GET localhost:8080/api/product?query=Test
 
 ###
-
-# Delete product
+# Delete product. Response body for 200 OK is empty.
 DELETE localhost:8080/api/product/1
-
-
