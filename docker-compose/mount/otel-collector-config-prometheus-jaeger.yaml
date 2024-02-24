@@ -9,15 +9,6 @@ receivers:
       http:
         endpoint: 0.0.0.0:4418
 
-# Processors' configuration section
-# See fore more details following documentation: https://opentelemetry.io/docs/collector/configuration/#processors
-processors:
-  # Data sources: traces, metrics, logs
-  memory_limiter:
-    check_interval: 1s
-    limit_mib: 4000
-    spike_limit_mib: 500
-
 
 # Exporters' configuration section
 # See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#exporters
@@ -37,7 +28,6 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter]
       exporters: [otlphttp]
     metrics:
       receivers: [otlp]

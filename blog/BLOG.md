@@ -89,7 +89,7 @@ One of the versions of the described setup might look in the following way:
 ![2-direct-publishing.png](images%2F2-direct-publishing.png)
 
 As it is shown in the diagram, OpenTelemetry instrumentation can directly send metrics to [Prometheus](https://prometheus.io) and traces to [Jaeger](https://www.jaegertracing.io).
-In the case of Java or any other JVM language, we can pick default [OpenTelemetry Java agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and use in the service Docker like so:
+In the case of Java or any other JVM language, we can pick the default [OpenTelemetry Java agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and use in the service Docker like so:
 ```dockerfile
 # Download OpenTelemetry
 ARG OTEL_VERSION=v2.0.0
@@ -126,4 +126,67 @@ We can open of the traces to check details and inner spans:
 ![3-direct-publishing-jaeger-trace.png](images%2F3-direct-publishing-jaeger-trace.png)
 
 ## Publishing to a collector
-Since our
+Now we have a telemetry infrastructure for the products service up and running. However, the world is evolving over time and 
+there might be a need to migrate to other monitoring systems or add new ones. In case of a single application it might be not a big deal, but in case of a big system with many services, this might be a serious challenge.
+This is one of the cases when OpenTelemetry Collector comes to the rescue. It can be used to decouple the application from the monitoring infrastructure and provide a single point of configuration for all telemetry data.
+OpenTelemetry collector works with OTLP protocol, mentioned in the introduction, and can be configured to export telemetry data to various backends.
+A collector usually consists of the following components:
+- [Receivers](https://opentelemetry.io/docs/collector/configuration/#receivers) - describe how to receive telemetry data (e.g. extract);
+- [Processors](https://opentelemetry.io/docs/collector/configuration/#processors) - describe how to process telemetry data (e.g. transform);
+- [Exporters](https://opentelemetry.io/docs/collector/configuration/#exporters) - describe how to export telemetry data (e.g. load).;
+- [Connectors](https://opentelemetry.io/docs/collector/configuration/#exporters) - describe how to connect telemetry data pipelines. Not covered here;
+- [Extensions](https://opentelemetry.io/docs/collector/configuration/#extensions) - describe how to extend the collector with additional capabilities. Not covered here;
+
+So to decouple the application from the monitoring infrastructure, this collector needs to do is to receive telemetry data from the application and send metrics to the Prometheus and traces to Jaeger as before.
+In terms of components it means that the collector needs to have OTLP receiver and exporters for Prometheus and Jaeger.
+
+Such a setup might look like the following diagram:
+![4-publishing-via-collector.png](images%2F4-publishing-via-collector.png)
+
+This can be achieved with the following configuration:
+```yaml
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4418
+
+exporters:
+  otlphttp:
+    endpoint: http://jaeger:4318
+
+  prometheus:
+    endpoint: 0.0.0.0:9094
+    namespace: products_service
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlphttp]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus]
+```
+which later can be supplied to the collector as a configuration file for instance in a Docker compose:
+```yaml
+otel-collector:
+  image: otel/opentelemetry-collector-contrib:0.93.0
+  hostname: otel-collector
+  volumes:
+    - ./mount/otel-collector-config-prometheus-jaeger.yaml:/etc/otelcol-contrib/config.yaml
+  ports:
+    - "9094:9094" # Prometheus http exporter
+    - "4418:4418" # OTLP http receiver
+```
+
+After this, we need to update the application configuration to send telemetry data to the collector:
+```shell
+OTEL_SERVICE_NAME=products_service
+OTEL_METRICS_EXPORTER=otlp
+OTEL_TRACES_EXPORTER=otlp
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4418
+```
+
+You can find in the GitHub repository [Docker compose file](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/master/docker-compose/setup-direct-publishing.yaml) to run this setup.
+After running the setup, you can run the script to simulate traffic again and observe same results as in the previous section.
