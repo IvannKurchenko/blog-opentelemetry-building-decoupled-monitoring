@@ -126,7 +126,7 @@ We can open of the traces to check details and inner spans:
 ![3-direct-publishing-jaeger-trace.png](images%2F3-direct-publishing-jaeger-trace.png)
 
 ## Publishing to a collector
-Now we have a telemetry infrastructure for the products service up and running. However, the world is evolving over time and 
+Now we have a telemetry infrastructure for the Products Service up and running. However, the world is evolving over time and 
 there might be a need to migrate to other monitoring systems or add new ones. In case of a single application it might be not a big deal, but in case of a big system with many services, this might be a serious challenge.
 This is one of the cases when OpenTelemetry Collector comes to the rescue. It can be used to decouple the application from the monitoring infrastructure and provide a single point of configuration for all telemetry data.
 OpenTelemetry collector works with OTLP protocol, mentioned in the introduction, and can be configured to export telemetry data to various backends.
@@ -138,7 +138,7 @@ A collector usually consists of the following components:
 - [Extensions](https://opentelemetry.io/docs/collector/configuration/#extensions) - describe how to extend the collector with additional capabilities. Not covered here;
 
 So to decouple the application from the monitoring infrastructure, this collector needs to do is to receive telemetry data from the application and send metrics to the Prometheus and traces to Jaeger as before.
-In terms of components it means that the collector needs to have OTLP receiver and exporters for Prometheus and Jaeger.
+In terms of components, it means that the collector needs to have OTLP receiver and exporters for Prometheus and Jaeger.
 
 Such a setup might look like the following diagram:
 ![4-publishing-via-collector.png](images%2F4-publishing-via-collector.png)
@@ -260,3 +260,94 @@ Let's search log lines containing `Creating product` message that is produced by
 ![5-extended-system-loki.png](images%2F5-extended-system-loki.png)
 
 We extended the monitoring infrastructure without touching the application, only by changing the OpenTelemetry Collector configuration.
+
+## Processing telemetry data
+As it was mentioned before, OpenTelemetry Collector can receive, process and export telemetry data. It was shown how to configure it to receive and export telemetry data, hence it is worth mentioning how to process it.
+OpenTelemetry provides a number of processors which provides reach possibilities for telemetry filtering, dimension modifications, batching, etc. Please, see for more details the following [documentation](https://opentelemetry.io/docs/collector/configuration/#processors).
+The Products Service implements a simple health check API used by Docker to verify whether the application is ready to serve traffic. This is `GET /health` endpoint, that writes `Health check API invoked!` log on every call. This API is not interesting for monitoring, and we might want to filter it out.
+[Filter processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor) is a perfect fit for this task. Also lets imaging that there might be multiple environments, and we want to add an attribute to all telemetry data to distinguish them.
+[Attributes Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor) can help with the requirement.
+We can add these processors to the OpenTelemetry Collector configuration in the following way
+```yaml
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4418
+
+processors:
+  # Filter HTTP spans to server for `GET /health` requests because of spam.
+  filter/exclude-health-api-traces:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.route"] == "/health"'
+
+  # Filter logs for `GET /health` requests logs because of spam.
+  filter/exclude-health-api-logs:
+    logs:
+      exclude:
+        match_type: regexp
+        bodies:
+          - '.*Health check API invoked!.*'
+
+  # Add environment attribute to all telemetry signals.
+  attributes/add-environment:
+    actions:
+      - key: environment
+        value: development
+        action: insert
+
+exporters:
+  otlphttp/jaeger:
+    endpoint: http://jaeger:4318
+
+  otlphttp/grafana-agent:
+    endpoint: http://grafana-agent:4318
+
+  prometheus:
+    endpoint: 0.0.0.0:9094
+    namespace: products_service
+
+service:
+  pipelines:
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - filter/exclude-health-api-traces
+        - attributes/add-environment
+      exporters:
+        - otlphttp/jaeger
+        - otlphttp/grafana-agent
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - attributes/add-environment
+      exporters:
+        - prometheus
+        - otlphttp/grafana-agent
+    logs:
+      receivers:
+        - otlp
+      processors:
+        - filter/exclude-health-api-logs
+        - attributes/add-environment
+      exporters:
+        - otlphttp/grafana-agent
+```
+
+You can find in the GitHub repository [Docker compose file](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/master/docker-compose/setup-otel-collector-publishing-extended-process.yaml) to run this setup.
+After running the setup, you can run the script to simulate traffic again.
+To check weather logs for `GET /health` requests are filtered out, open Loki in Grafana and search for log lines containing `Health check API invoked!` message. You should not see any log lines containing this message:
+![6-filter-telemetry-loki.png](images%2F6-filter-telemetry-loki.png)
+
+In Tempo, you can search for traces using span tags `http.route` equals to `/health` and you should not see any traces for this route:
+![6-filter-telemetry-tempo.png](images%2F6-filter-telemetry-tempo.png)
+
+Along with this you can check logs in to see that there is a new `environment` label with `development` value:
+![6-process-telemetry-loki.png](images%2F6-process-telemetry-loki.png)
+
+And pick any trace to see same new `environment` tag:
+![6-process-telemetry-tempo.png](images%2F6-process-telemetry-tempo.png)

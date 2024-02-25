@@ -18,11 +18,6 @@ receivers:
 # Processors' configuration section
 # See fore more details following documentation: https://opentelemetry.io/docs/collector/configuration/#processors
 processors:
-  # Data sources: traces, metrics, logs
-  memory_limiter:
-    check_interval: 1s
-    limit_mib: 4000
-    spike_limit_mib: 500
 
   # Filter HTTP spans to server for `GET /health` requests because of spam.
   # See documentation for more details:
@@ -78,7 +73,6 @@ service:
       receivers:
         - otlp
       processors:
-        - memory_limiter
         - filter/exclude-health-api-traces
         - attributes/add-environment
       exporters:
@@ -88,7 +82,6 @@ service:
       receivers:
         - otlp
       processors:
-        - memory_limiter
         - attributes/add-environment
       exporters:
         - prometheus
@@ -97,7 +90,6 @@ service:
       receivers:
         - otlp
       processors:
-        - memory_limiter
         - filter/exclude-health-api-logs
         - attributes/add-environment
       exporters:
