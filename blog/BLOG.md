@@ -351,3 +351,17 @@ Along with this you can check logs in to see that there is a new `environment` l
 
 And pick any trace to see same new `environment` tag:
 ![6-process-telemetry-tempo.png](images%2F6-process-telemetry-tempo.png)
+
+## Conclusion
+OpenTelemetry is a great framework to build a complete observability system. 
+Although it has a pretty wide number of tools, bear in mind that some of them are in "alpha" or "beta" stage and subject to change.
+
+## References
+- [GitHub repository with all the code](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring);
+- [OTEL collector documentation](https://opentelemetry.io/docs/collector/);
+- [OTEL recommended Processors](https://github.com/open-telemetry/opentelemetry-collector/tree/main/processor#recommended-processors);
+- [OTEL Registry](https://opentelemetry.io/ecosystem/registry/) - find instrumentation for your language or framework and any other components;
+- [Spring Boot instrumentation](https://opentelemetry.io/docs/languages/java/automatic/spring-boot/);
+- [Introducing native support for OpenTelemetry in Jaeger](https://medium.com/jaegertracing/introducing-native-support-for-opentelemetry-in-jaeger-eb661be8183c);
+- [Sending Traces with the Grafana Agent for Grafana Tempo](https://medium.com/@gleydsoncavalcanti/sending-traces-with-the-grafana-agent-for-grafana-tempo-4092b25c35d0);
+- [Introduction to Metrics, Logs, Traces and Profiles in Grafana](https://github.com/grafana/intro-to-mltp);
