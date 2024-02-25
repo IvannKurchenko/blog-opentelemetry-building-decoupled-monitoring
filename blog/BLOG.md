@@ -6,9 +6,10 @@ In this blog post, we will explore how to use OpenTelemetry Collector to build a
 ## Introduction
 [OpenTelemetry](https://opentelemetry.io/docs/), as documentation says, is:
 > OpenTelemetry, also known as OTel, is a vendor-neutral open source Observability framework for instrumenting, generating, collecting, and exporting telemetry data such as traces, metrics, and logs.
+In further text, we will refer to OpenTelemetry as OTEL.
 
 It covers a wide range of observability aspects: application instrumentation, telemetry data processing and publishing to other telemetry backends.
-However, it is important to mention that OpenTelemetry itself is not a telemetry storage or visualization tool.
+Although OpenTelemetry excels in these areas, it's designed to integrate with, rather than replace, telemetry storage and visualization tools.  
 There are plenty of other systems that provide those capabilities, such as commercial APMs like Datadog or open source tools like Zipkin. 
 
 To cover all these processes, OTEL provides a number of components to build a complete observability system:
@@ -22,7 +23,6 @@ In particular, I'd like to mention two specifications:
 - [Semantic conversions](https://opentelemetry.io/docs/specs/semconv/) - set of standard notions for telemetry data. For instance, any HTTP framework instrumentation needs to produce the same metrics with same attributes as it described in [HTTP Sever Metrics](https://opentelemetry.io/docs/specs/semconv/http/http-metrics/#metric-httpserverrequestduration) part of specification.   
 
 We will not do a deep inside these specs, but it is worth briefly mentioning them for better further understanding.
-
 
 ## System under monitoring
 To showcase the capabilities of OpenTelemetry, let's first build a simple service to monitor.
@@ -84,20 +84,20 @@ Although This service is implemented in Java and Spring Boot, please, bear in mi
 
 ## Direct publishing
 We have an application that we want to monitor. In the simplest case, we can plug the instrumentation and supply configuration to send telemetry data directly to backends.
-One of the versions of the described setup might look in the following way:
+The diagram shows how OpenTelemetry instrumentation directly sends metrics to Prometheus and traces to Jaeger:
 
 ![2-direct-publishing.png](images%2F2-direct-publishing.png)
 
 As it is shown in the diagram, OpenTelemetry instrumentation can directly send metrics to [Prometheus](https://prometheus.io) and traces to [Jaeger](https://www.jaegertracing.io).
 In the case of Java or any other JVM language, we can pick the default [OpenTelemetry Java agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation) and use in the service Docker like so:
 ```dockerfile
-# Download OpenTelemetry
+# Download the OpenTelemetry Java agent for instrumentation. 
 ARG OTEL_VERSION=v2.0.0
 RUN wget https://github.com/open-telemetry/opentelemetry-java-instrumentation/releases/download/$OTEL_VERSION/opentelemetry-javaagent.jar
 
 #...
 
-# Add java agnet to enable telemetry instrumentation
+# Add java agnet to enable telemetry instrumentation.
 ENTRYPOINT ["java","-javaagent:opentelemetry-javaagent.jar","-jar","/usr/app/products-service.jar"]
 ```
 
@@ -127,7 +127,7 @@ We can open of the traces to check details and inner spans:
 
 ## Publishing to a collector
 Now we have a telemetry infrastructure for the Products Service up and running. However, the world is evolving over time and 
-there might be a need to migrate to other monitoring systems or add new ones. In case of a single application it might be not a big deal, but in case of a big system with many services, this might be a serious challenge.
+there might be a need to migrate to other monitoring systems or add new ones. In case of a single application, it might be not a big deal, but in case of a big system with many services, this might be a serious challenge.
 This is one of the cases when OpenTelemetry Collector comes to the rescue. It can be used to decouple the application from the monitoring infrastructure and provide a single point of configuration for all telemetry data.
 OpenTelemetry collector works with OTLP protocol, mentioned in the introduction, and can be configured to export telemetry data to various backends.
 A collector usually consists of the following components:
@@ -193,12 +193,12 @@ After running the setup, you can run the script to simulate traffic again and ob
 
 ## Extending monitoring system
 Since we introduced OpenTelemetry Collector to the infrastructure, it is easier to extend the monitoring system with new backends.
-For instance, we might to have a single place to view and analyze all telemetry data. Some sort of Application Monitoring System (APM), such as commercial solutions like Datadog or open source ones like Grafana.
+For instance, we might want to have a single place to view and analyze all telemetry data. Some sort of Application Monitoring System (APM), such as commercial solutions like Datadog or open source ones like Grafana.
 Grafana OSS provides a set of tools to build a complete observability system also known as [LGTM stack](https://grafana.com/go/observabilitycon/2022/lgtm-scale-observability-with-mimir-loki-and-tempo/):
-- [Mimir](https://grafana.com/docs/mimir/latest/) - a metrics storage;
-- [Tempo](https://grafana.com/docs/tempo/latest/) - a tracing storage;
 - [Loki](https://grafana.com/docs/loki/latest/) - a logs storage;
-- [Grafana](https://grafana.com/docs/grafana/latest/) - a visualization tool.
+- [Grafana](https://grafana.com/docs/grafana/latest/) - a tool for visualization and analysis;
+- [Tempo](https://grafana.com/docs/tempo/latest/) - a traces storage;
+- [Mimir](https://grafana.com/docs/mimir/latest/) - a metrics storage;
 
 Another crucial component in this stack is [Grafana Agent](https://grafana.com/docs/agent/latest/) which responsible for many things like collecting telemetry data and sending it to the backends.
 In our case, this agent can be configured to receive telemetry data from the OpenTelemetry Collector and send it to LGTM stack components.
