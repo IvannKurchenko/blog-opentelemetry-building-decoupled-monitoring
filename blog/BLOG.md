@@ -263,11 +263,15 @@ We extended the monitoring infrastructure without touching the application, only
 
 ## Processing telemetry data
 As it was mentioned before, OpenTelemetry Collector can receive, process and export telemetry data. It was shown how to configure it to receive and export telemetry data, hence it is worth mentioning how to process it.
+
 OpenTelemetry provides a number of processors which provides reach possibilities for telemetry filtering, dimension modifications, batching, etc. Please, see for more details the following [documentation](https://opentelemetry.io/docs/collector/configuration/#processors).
+
 The Products Service implements a simple health check API used by Docker to verify whether the application is ready to serve traffic. This is `GET /health` endpoint, that writes `Health check API invoked!` log on every call. This API is not interesting for monitoring, and we might want to filter it out.
-[Filter processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor) is a perfect fit for this task. Also lets imaging that there might be multiple environments, and we want to add an attribute to all telemetry data to distinguish them.
-[Attributes Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor) can help with the requirement.
-We can add these processors to the OpenTelemetry Collector configuration in the following way
+[Filter processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/filterprocessor) is a perfect fit for this task.
+
+Also lets imaging that there might be multiple environments, and we want to add an attribute to all telemetry data to distinguish them. [Attributes Processor](https://github.com/open-telemetry/opentelemetry-collector-contrib/tree/main/processor/attributesprocessor) can help with the requirement.
+
+We can add these processors to the OpenTelemetry Collector configuration in the following way:
 ```yaml
 receivers:
   otlp:
