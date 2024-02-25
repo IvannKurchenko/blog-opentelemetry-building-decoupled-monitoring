@@ -190,3 +190,73 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4418
 
 You can find in the GitHub repository [Docker compose file](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/master/docker-compose/setup-direct-publishing.yaml) to run this setup.
 After running the setup, you can run the script to simulate traffic again and observe same results as in the previous section.
+
+## Extending monitoring system
+Since we introduced OpenTelemetry Collector to the infrastructure, it is easier to extend the monitoring system with new backends.
+For instance, we might to have a single place to view and analyze all telemetry data. Some sort of Application Monitoring System (APM), such as commercial solutions like Datadog or open source ones like Grafana.
+Grafana OSS provides a set of tools to build a complete observability system also known as [LGTM stack](https://grafana.com/go/observabilitycon/2022/lgtm-scale-observability-with-mimir-loki-and-tempo/):
+- [Mimir](https://grafana.com/docs/mimir/latest/) - a metrics storage;
+- [Tempo](https://grafana.com/docs/tempo/latest/) - a tracing storage;
+- [Loki](https://grafana.com/docs/loki/latest/) - a logs storage;
+- [Grafana](https://grafana.com/docs/grafana/latest/) - a visualization tool.
+
+Another crucial component in this stack is [Grafana Agent](https://grafana.com/docs/agent/latest/) which responsible for many things like collecting telemetry data and sending it to the backends.
+In our case, this agent can be configured to receive telemetry data from the OpenTelemetry Collector and send it to LGTM stack components.
+Such setup can be shown in the following diagram:
+![5-extended-system.png](images%2F5-extended-system.png)
+
+To achieve this, we need to add a new exporter to the OpenTelemetry Collector configuration:
+```yaml
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4418
+
+exporters:
+  otlphttp/jaeger:
+    endpoint: http://jaeger:4318
+
+  otlphttp/grafana-agent:
+    endpoint: http://grafana-agent:4318
+
+  prometheus:
+    endpoint: 0.0.0.0:9094
+    namespace: products_service
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [otlphttp/jaeger,otlphttp/grafana-agent]
+    metrics:
+      receivers: [otlp]
+      exporters: [prometheus,otlphttp/grafana-agent]
+    logs:
+      receivers: [otlp]
+      exporters: [otlphttp/grafana-agent]
+```
+
+As you can see, we configured a new exporter `otlphttp/grafana-agent` that is added in `service` section to the `traces`, `metrics` and `logs` pipelines.
+Aside not here: pay attention to exporter names as they should be unique and follow the pattern `{protocol}/{name}`. Exporter name can be omitted if there is only one exporter for the protocol.
+For sake of simplicity, we omitted the configuration of Grafana Agent and LGTM stack components, but you can find it in the GitHub repository:
+- [Docker compose file](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/master/docker-compose/setup-otel-collector-publishing-extended.yaml)
+- [Grafana Agent configuration](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/master/docker-compose/mount/grafana-agent.river)
+- [Mimir configuration](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/docker-compose/mount/grafana-mimir.yaml)
+- [Tempo configuration](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/docker-compose/mount/grafana-tempo.yaml)
+- [Loki configuration](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/docker-compose/mount/grafana-loki.yaml)
+- [Grafana configuration](https://github.com/IvannKurchenko/blog-opentelemetry-building-decoupled-monitoring/blob/main/docker-compose/mount/grafana-datasources.yaml)
+
+After running the setup, you can run the script to simulate traffic again.
+To check the metrics in Grafana, open http://localhost:3000, go to the "Explore" section and choose "Mimir" at the dropdown. We can use similar PrompQL query for testing: `sum(products_service_http_server_request_duration_seconds_sum) / sum(products_service_http_server_request_duration_seconds_count)`
+Resulting graph could look something like this:
+![5-extended-system-mimir.png](images%2F5-extended-system-mimir.png)
+In the same Grafana, we can find traces in Tempo. Open http://localhost:3000, go to the "Explore" section and choose "Tempo" at the dropdown. You can search for traces for "Resource Service Name" equals to `products_service` and "Span Name" `POST /api/product`.
+In the result search list you can pick any trace to see details and inner spans. The resulting trace could look something like this:
+![5-extended-system-tempo.png](images%2F5-extended-system-tempo.png)
+
+Now we can check logs in Loki. Open http://localhost:3000, go to the "Explore" section and choose "Loki" at the dropdown. 
+Let's search log lines containing `Creating product` message that is produced by the product service on product creation. The resulting log lines could look something like this:
+![5-extended-system-loki.png](images%2F5-extended-system-loki.png)
+
+We extended the monitoring infrastructure without touching the application, only by changing the OpenTelemetry Collector configuration.

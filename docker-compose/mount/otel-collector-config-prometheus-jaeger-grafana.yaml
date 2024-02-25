@@ -13,16 +13,6 @@ receivers:
       http:
         endpoint: 0.0.0.0:4418
 
-# Processors' configuration section
-# See fore more details following documentation: https://opentelemetry.io/docs/collector/configuration/#processors
-processors:
-  # Data sources: traces, metrics, logs
-  memory_limiter:
-    check_interval: 1s
-    limit_mib: 4000
-    spike_limit_mib: 500
-
-
 # Exporters' configuration section
 # See for more details following documentation: https://opentelemetry.io/docs/collector/configuration/#exporters
 # Important note: exporter name patter is following - `{protocol}/{exporter_name}`.
@@ -46,12 +36,10 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter]
       exporters: [otlphttp/jaeger,otlphttp/grafana-agent]
     metrics:
       receivers: [otlp]
       exporters: [prometheus,otlphttp/grafana-agent]
     logs:
       receivers: [otlp]
-      processors: [memory_limiter]
       exporters: [otlphttp/grafana-agent]
